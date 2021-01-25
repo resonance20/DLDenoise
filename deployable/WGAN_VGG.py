@@ -130,7 +130,7 @@ class wgan_vgg(model):
 
     def infer(self, x):
 
-        self.gen.load_state_dict(torch.load('deployable/WGAN_gen_10.pth'))#Please change this directory if you change the model file location!!
+        self.gen.load_state_dict(torch.load('deployable/WGAN_gen_30.pth'))#Please change this directory if you change the model file location!!
 
         for p in self.gen.parameters():
             p.requires_grad = False
