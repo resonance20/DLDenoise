@@ -28,18 +28,20 @@ class model:
         valloader = torch.utils.data.DataLoader(dataset, batch_size=bsize, shuffle=True)
         return dataloader, valloader
 
+    def _make_patches3d(self, x, thickness, psize=64):
+        num = int(x.shape[1]/psize)
+        return x.reshape(x.shape[0], thickness, num, psize, num, psize).swapaxes(3, 4). \
+            reshape(x.shape[0], thickness, -1, psize, psize).swapaxes(1, 2).reshape(-1, thickness, psize, psize)
+
+    def _make_patches2d(self, x, psize=64):
+        num = int(x.shape[1]/psize)
+        return x.reshape(x.shape[0], num, psize, num, psize).swapaxes(2, 3).reshape( -1, psize, psize)
+
     def _make_patches(self, x, thickness):
         if thickness == 1:
-            return _make_patches2d(x)
+            return self._make_patches2d(x)
         else:
-            return _make_patches3d(x, thickness)
-
-    def _make_patches3d(self, x, thickness):
-        return x.reshape(x.shape[0], thickness, 8, 64, 8, 64).swapaxes(3, 4). \
-            reshape(x.shape[0], thickness, -1, 64, 64).swapaxes(1, 2).reshape(-1, thickness, 64, 64)
-
-    def _make_patches2d(self, x):
-        return x.reshape(x.shape[0], 4, 64, 4, 64).swapaxes(2, 3).reshape( -1, 64, 64)
+            return self._make_patches3d(x, thickness)
 
     def _torchify(self, x):
         return torch.from_numpy(x).float().unsqueeze(1)
@@ -47,5 +49,5 @@ class model:
     def infer(self, x):
         pass
 
-    def train(self, x, y, epoch_number = 25):
+    def train(self, x, y, epoch_number = 30):
         pass

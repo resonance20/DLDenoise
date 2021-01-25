@@ -164,6 +164,9 @@ class jbfnet(model):
 
     def infer(self, x):
 
+        if len(x.shape)==2:
+            x = np.expand_dims(x, axis=0)
+
         x_pad = np.pad(x, ((7, 7), (0, 0), (0, 0)), 'edge')
         
         self.jbf_net.load_state_dict(torch.load('deployable/JBFnet_30.pth'))#Please change this directory if you change the model file location!!

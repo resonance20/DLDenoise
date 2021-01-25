@@ -95,6 +95,9 @@ class gan_3d(model):
         print('Number of params in GAN: %d'%(params))
 
     def infer(self, x):
+        
+        if len(x.shape)==2:
+            x = np.expand_dims(x, axis=0)
 
         x_pad = np.pad(x, ((7, 7), (7, 7), (7, 7)), 'edge')
 

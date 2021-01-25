@@ -65,6 +65,9 @@ class cpce3d(model):
 
     def infer(self, x):
 
+        if len(x.shape)==2:
+            x = np.expand_dims(x, axis=0)
+
         x_pad = np.pad(x, ((4, 4), (0, 0), (0, 0)), 'edge')
         
         self.redcnn.load_state_dict(torch.load('deployable/REDCNN_25.pth'))#Please change this directory if you change the model file location!!
