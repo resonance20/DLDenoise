@@ -8,10 +8,15 @@ This consists of the following models at the moment:
 Model | Paper | Class Name | 2D or 3D | Train functionality tested
 --- | --- | --- | --- |---
 JBFnet | [Patwari et al.](https://link.springer.com/chapter/10.1007/978-3-030-59713-9_49) | jbfnet | 3D | No
-QAE| [Fan et al.](https://ieeexplore.ieee.org/document/8946589) | quadratic_autoencoder | 2D | No
-CPCE3D| [Shan et al.](https://ieeexplore.ieee.org/document/8353466) | cpce3d | 3D | No
-GAN| [Wolterink et al.](https://ieeexplore.ieee.org/document/7934380) | gan_3d | 3D | No
-WGAN-VGG| [Yang et al.](https://ieeexplore.ieee.org/document/8340157) | wgan_vgg | 2D | No
+QAE| [Fan et al.](https://ieeexplore.ieee.org/document/8946589) | quadratic_autoencoder | 2D | Yes
+CPCE3D| [Shan et al.](https://ieeexplore.ieee.org/document/8353466) | cpce3d | 3D | Yes
+GAN| [Wolterink et al.](https://ieeexplore.ieee.org/document/7934380) | gan_3d | 3D | Yes
+WGAN-VGG| [Yang et al.](https://ieeexplore.ieee.org/document/8340157) | wgan_vgg | 2D | Yes
+CNN| [Chen et al.](https://www.osapublishing.org/boe/fulltext.cfm?uri=boe-8-2-679) | cnn | 2D | Yes
+REDCNN| [Chen et al.](https://ieeexplore.ieee.org/document/7947200) | red_cnn | 2D | Yes
+
+##Model Files
+Trained model files on the AAPM Grand Challenge dataset are available in the folders with the respective model names.
 
 ## Example
 Here is an example to denoise a single slice using QAE:
@@ -19,7 +24,7 @@ Here is an example to denoise a single slice using QAE:
 from dldenoise.deployable import quadratic_autoencoder
 
 model = quadratic_autoencoder()#No need to use CUDA, it should be automatically handled
-denoised_im = model.infer(noisy_im)#You can also pass 3D numpy arrays, in which case you will recieve a denoised volume as output
+denoised_im = model.infer(noisy_im, fname='models/QAE/QAE_30.pth')#You can also pass 3D numpy arrays, in which case you will recieve a denoised volume as output
 ```
 The input should be a 2D NumPy array or 3D NumPy volume, of datatype float32. The values should range from 0 - 4096.
 
