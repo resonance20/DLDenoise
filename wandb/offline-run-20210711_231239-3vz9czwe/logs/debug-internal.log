@@ -1,0 +1,31 @@
+2021-07-11 23:12:42,512 INFO    MainThread:14572 [internal.py:wandb_internal():91] W&B internal server running at pid: 14572, started at: 2021-07-11 23:12:42.497215
+2021-07-11 23:12:42,512 INFO    WriterThread:14572 [datastore.py:open_for_write():80] open: C:\Users\z003zv1a\Desktop\Code\analysis\wandb\offline-run-20210711_231239-3vz9czwe\run-3vz9czwe.wandb
+2021-07-11 23:12:42,512 DEBUG   HandlerThread:14572 [handler.py:handle_request():124] handle_request: run_start
+2021-07-11 23:12:56,102 WARNING MainThread:14572 [internal.py:wandb_internal():147] Internal process interrupt: 1
+2021-07-11 23:12:56,576 WARNING MainThread:14572 [internal.py:wandb_internal():147] Internal process interrupt: 2
+2021-07-11 23:12:56,592 ERROR   MainThread:14572 [internal.py:wandb_internal():150] Internal process interrupted.
+2021-07-11 23:12:57,047 INFO    WriterThread:14572 [datastore.py:close():288] close: C:\Users\z003zv1a\Desktop\Code\analysis\wandb\offline-run-20210711_231239-3vz9czwe\run-3vz9czwe.wandb
+2021-07-11 23:12:57,047 INFO    SenderThread:14572 [sender.py:finish():945] shutting down sender
+2021-07-11 23:13:37,034 DEBUG   HandlerThread:14572 [meta.py:__init__():39] meta init
+2021-07-11 23:13:37,035 DEBUG   HandlerThread:14572 [meta.py:__init__():53] meta init done
+2021-07-11 23:13:37,035 DEBUG   HandlerThread:14572 [meta.py:probe():210] probe
+2021-07-11 23:13:37,073 DEBUG   HandlerThread:14572 [meta.py:_setup_git():200] setup git
+2021-07-11 23:13:37,443 DEBUG   HandlerThread:14572 [meta.py:_setup_git():207] setup git done
+2021-07-11 23:13:37,443 DEBUG   HandlerThread:14572 [meta.py:_save_pip():57] save pip
+2021-07-11 23:13:37,443 DEBUG   HandlerThread:14572 [meta.py:_save_pip():71] save pip done
+2021-07-11 23:13:37,443 DEBUG   HandlerThread:14572 [meta.py:_save_conda():78] save conda
+2021-07-11 23:13:37,460 ERROR   HandlerThread:14572 [meta.py:_save_conda():85] Error saving conda packages
+Traceback (most recent call last):
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\site-packages\wandb\sdk\internal\meta.py", line 83, in _save_conda
+    subprocess.call(["conda", "env", "export"], stdout=f)
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\subprocess.py", line 304, in call
+    with Popen(*popenargs, **kwargs) as p:
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\subprocess.py", line 756, in __init__
+    restore_signals, start_new_session)
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\subprocess.py", line 1155, in _execute_child
+    startupinfo)
+FileNotFoundError: [WinError 2] Das System kann die angegebene Datei nicht finden
+2021-07-11 23:13:37,473 DEBUG   HandlerThread:14572 [meta.py:_save_conda():86] save conda done
+2021-07-11 23:13:37,473 DEBUG   HandlerThread:14572 [meta.py:probe():252] probe done
+2021-07-11 23:13:37,525 INFO    HandlerThread:14572 [handler.py:finish():638] shutting down handler
+2021-07-11 23:13:37,570 INFO    MainThread:14572 [internal.py:handle_exit():78] Internal process exited

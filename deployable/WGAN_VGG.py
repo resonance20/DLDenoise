@@ -2,7 +2,6 @@
 import matplotlib.pyplot as plt
 import time
 import numpy as np
-from numpy.lib.type_check import real
 
 import torch
 import torch.nn as nn
@@ -10,8 +9,11 @@ import torch.optim as optim
 from torch.autograd import grad, Variable
 import torch.nn.functional as F
 import torch.utils.data
-import torchvision
+from torch.utils.data import DataLoader
+
 import math
+import pytorch_ssim
+import wandb
 
 from deployable.model import model
 
@@ -88,21 +90,6 @@ class wgan_vgg(model):
             x = self.fc2(x)
 
             return x
-
-    #VGG features
-    class _VGGfeat(nn.Module):
-        def __init__(self):
-            super(wgan_vgg._VGGfeat, self).__init__()
-            vgg19_model = torchvision.models.vgg19(pretrained=True).eval()
-            self.feature_extractor = nn.Sequential(*list(vgg19_model.features.children())[:35])
-            self.feature_extractor.eval()
-
-        def forward(self, x):
-            if len(x.shape)==5:
-                x = x.squeeze(2)
-            x = x.repeat(1, 3, 1, 1)
-            out = self.feature_extractor(x)
-            return out
     
     def _gradient_penalty(self, real_data, generated_data):
 
@@ -137,7 +124,7 @@ class wgan_vgg(model):
         # Return gradient penalty
         return 10 * ((gradients_norm - 1) ** 2).mean()
 
-    def infer(self, x, fname = 'deployable/WGAN_gen_30.pth'):
+    def _infer(self, x, fname = 'deployable/WGAN_gen_30.pth'):
 
         self.gen.load_state_dict(torch.load(fname))
 
@@ -158,80 +145,55 @@ class wgan_vgg(model):
         print('Inference complete!')
         return np.squeeze(denoised_patches.cpu().detach().numpy(), axis = 1)
 
-    def train(self, x, y, thickness = 1, epoch_number = 25, batch_size = 48, fname = 'WGAN'):
+    def train(self, train_dataset, val_dataset, epoch_number = 25, batch_size = 48, fname = 'WGAN'):
 
         for p in self.gen.parameters():
             p.requires_grad = True
+            
+        wandb.init(project="CT-Denoise", reinit=True)
+        wandb.run.name = fname.split("/")[-1]
+        wandb.run.save()
+        wandb.watch(self.gen)
+        wandb.config.update({'epochs':epoch_number, 'batch_size':batch_size, 'lr':1e-5, 'betas':(0.5, 0.9)})
 
-        dataloader, valloader = self._prepare_training_data(x, y, thickness=thickness, bsize=batch_size)
+        dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
+        valloader = DataLoader(dataset=val_dataset, batch_size=batch_size, shuffle=True)
         
         self.disc = self._disc().to(self.device)
-        self.loss_net = self._VGGfeat().to(self.device)
 
         params = sum([np.prod(p.size()) for p in self.disc.parameters()])
         print('Number of params in discriminator: %d'%(params))
 
         optim_gen = optim.Adam(self.gen.parameters(), lr=1e-5, betas=(0.5, 0.9))
-        optim_disc = optim.Adam(self.disc.parameters(), lr=1e-5, betas=(0.5, 0.9))        
+        optim_disc = optim.Adam(self.disc.parameters(), lr=1e-5, betas=(0.5, 0.9))
+        vgg_loss_fn = self._VGGLoss()
 
         for epoch in range(epoch_number):
-            running_loss = 0
-            mse_loss_val = 0
-            vgg_loss_val = 0
+            
+            l1_loss = 0
+            mse_loss = 0
+            vgg_loss = 0
+            ssim = 0
+
             self.gen.train() 
 
             start = time.time()
-            iterator = iter(dataloader)
 
             #Train step
-            for i in range(0, int(len(dataloader)/5)):
-
-                for _ in range(4):
-
-                    disc_loss = 0
-
-                    #Load data and initialise optimisers
-                    phantom_in, noisy_in = next(iterator)
-
-                    #Rescale
-                    if thickness > 1:
-                        cont = math.floor((thickness - 1)/2)
-                        phantom_in = phantom_in[:, :, cont:-cont]
-
-                    phantom_in = phantom_in.to(self.device)
-                    noisy_in = noisy_in.to(self.device)
-
-                    #Disc update step
-                    outputs1 = self.gen(noisy_in)
-                    shrinkage = phantom_in.shape[-1] - outputs1.shape[-1]
-                    if shrinkage != 0:
-                        cont = math.floor(shrinkage/2)
-                        if thickness > 1:
-                            phantom_in = phantom_in[:, :, :, cont:-cont, cont:-cont]
-                        else:
-                            phantom_in = phantom_in[:, :, cont:-cont, cont:-cont]
-                    fake_res = self.disc(outputs1).squeeze()
-                    real_res = self.disc(phantom_in).squeeze()
-
-                    #Run update
-                    disc_loss = torch.mean(fake_res) - torch.mean(real_res) + self._gradient_penalty(phantom_in, outputs1)
-
-                    optim_disc.zero_grad()
-                    disc_loss.backward()
-                    optim_disc.step()
+            for i, data in enumerate(dataloader, 0):
 
                 #Load data and initialise optimisers
-                phantom_in, noisy_in = next(iterator)
+                phantom_in, noisy_in = data
 
                 #Rescale
-                if thickness > 1:
-                    cont = math.floor((thickness - 1)/2)
+                if len(phantom_in.shape) == 5:
+                    cont = math.floor((phantom_in.shape[2] - 1)/2)
                     phantom_in = phantom_in[:, :, cont:-cont]
 
                 phantom_in = phantom_in.to(self.device)
                 noisy_in = noisy_in.to(self.device)
 
-                #Gen update step
+                #Disc update step
                 outputs1 = self.gen(noisy_in)
                 shrinkage = phantom_in.shape[-1] - outputs1.shape[-1]
                 if shrinkage != 0:
@@ -241,27 +203,21 @@ class wgan_vgg(model):
                     else:
                         phantom_in = phantom_in[:, :, cont:-cont, cont:-cont]
                 fake_res = self.disc(outputs1).squeeze()
-                """
-                fig, axes = plt.subplots(1, 3)
-                axes[0].imshow(noisy_in[0, 0, 4].cpu().detach().numpy(), cmap='gray')
-                axes[1].imshow(phantom_in[0, 0, 0].cpu().detach().numpy(), cmap='gray')
-                axes[2].imshow(noisy_in[0, 0, 2].cpu().detach().numpy(), cmap='gray')
-                plt.show()
-                """
-                #Calculate perceptual loss
-                feat1 = self.loss_net(outputs1/4095)
-                feat2 = self.loss_net(phantom_in/4095)
-                perc_loss = nn.MSELoss()(feat1, feat2)
-                
-                #Run update
-                optim_gen.zero_grad()
-                gen_loss = 0.1 * perc_loss - torch.mean(fake_res)
-                gen_loss.backward()
-                optim_gen.step()
+                real_res = self.disc(phantom_in).squeeze()
 
-                # print statistics
-                running_loss += gen_loss.item()
-                #print(gen_loss.item())
+                if i%5!=0:
+                    #Run update
+                    optim_disc.zero_grad()
+                    disc_loss = torch.mean(fake_res) - torch.mean(real_res) + self._gradient_penalty(phantom_in, outputs1)
+                    disc_loss.backward()
+                    optim_disc.step()
+
+                else:
+                    #Run update
+                    optim_gen.zero_grad()
+                    gen_loss = 0.1 * vgg_loss_fn(outputs1/4095, phantom_in/4095) - torch.mean(fake_res)
+                    gen_loss.backward()
+                    optim_gen.step()
 
             #Val step
             self.gen.eval()
@@ -272,8 +228,8 @@ class wgan_vgg(model):
                 phantom_in, noisy_in = data
 
                 #Rescale
-                if thickness > 1:
-                    cont = math.floor((thickness - 1)/2)
+                if len(phantom_in.shape) == 5:
+                    cont = math.floor((phantom_in.shape[2] - 1)/2)
                     phantom_in = phantom_in[:, :, cont:-cont]
 
                 phantom_in = phantom_in.to(self.device)
@@ -282,6 +238,7 @@ class wgan_vgg(model):
                 #Forward pass
                 with torch.no_grad():
                     outputs1 = self.gen(noisy_in)
+
                     shrinkage = phantom_in.shape[-1] - outputs1.shape[-1]
                     if shrinkage != 0:
                         cont = math.floor(shrinkage/2)
@@ -289,25 +246,26 @@ class wgan_vgg(model):
                             phantom_in = phantom_in[:, :, :, cont:-cont, cont:-cont]
                         else:
                             phantom_in = phantom_in[:, :, cont:-cont, cont:-cont]
-                    mse_loss = nn.MSELoss()(outputs1, phantom_in)
 
-                    #Calculate perceptual loss
-                    feat1 = self.loss_net(outputs1/4095*255)
-                    feat2 = self.loss_net(phantom_in/4095*255)
-                    perc_loss = nn.MSELoss()(feat1, feat2)
+                    l1_loss += nn.L1Loss()(phantom_in, outputs1)
+                    mse_loss += nn.MSELoss()(phantom_in, outputs1)
+                    if len(phantom_in.shape)==5:
+                        ssim += pytorch_ssim.SSIM()(phantom_in.squeeze(2), outputs1.squeeze(2))
+                        vgg_loss += vgg_loss_fn(phantom_in.squeeze(2), outputs1.squeeze(2))
+                    else:
+                        ssim += pytorch_ssim.SSIM()(phantom_in, outputs1)
+                        vgg_loss += vgg_loss_fn(phantom_in, outputs1)
 
-                # print statistics
-                mse_loss_val += mse_loss.item()
-                vgg_loss_val += perc_loss.item()
-
-            print('[%d, %5d] train_loss: %f val_mse_loss: %f val_vgg_loss: %f' %
-                    (epoch + 1, i + 1, running_loss / int(i+1), mse_loss_val / int(j+1), vgg_loss_val / int(j+1) ))
-            running_loss = 0.0
-            mse_loss_val = 0.0
-            vgg_loss_val = 0.0
 
             end = time.time()
             print('Time taken for epoch: '+str(end-start)+' seconds')
+            
+            wandb.log({
+                'l1_loss':l1_loss/(j+1),
+                'mse_loss':mse_loss/(j+1),
+                'vgg_loss':vgg_loss/(j+1),
+                'ssim':ssim/(j+1)
+            })
 
             if (epoch+1)%5 == 0:
                 print('Saving model...')
@@ -315,3 +273,4 @@ class wgan_vgg(model):
                 torch.save(self.disc.state_dict(), fname+'_disc_'+str(epoch+1)+'.pth')
 
         print('Training complete!')
+        wandb.run.finish()

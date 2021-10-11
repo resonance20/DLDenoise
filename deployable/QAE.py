@@ -89,3 +89,4 @@ class quadratic_autoencoder(cnn):
             x = F.leaky_relu(self.deconv2(x))
             x = F.relu(torch.add(self.deconv1(x), im) )
             return x*4096
+

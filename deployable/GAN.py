@@ -3,13 +3,15 @@ import os
 import numpy as np
 from sklearn.model_selection import train_test_split
 import time
+import pytorch_ssim
+import wandb
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.autograd as autograd
 import torch.nn.functional as F
-import torch.utils.data
+from torch.utils.data import DataLoader
 
 from deployable.model import model
 
@@ -95,7 +97,7 @@ class gan_3d(model):
             x = F.leaky_relu(self.lin1(x))
             return torch.sigmoid(self.lin2(x))
 
-    def infer(self, x, fname='deployable/GAN_gen_25.pth'):
+    def _infer(self, x, fname='deployable/GAN_gen_25.pth'):
 
         self.gen.load_state_dict(torch.load(fname))
 
@@ -118,23 +120,36 @@ class gan_3d(model):
         return np.squeeze(denoised_patches.cpu().detach().numpy())
 
     
-    def train(self, x, y, fname, thickness = 19, epoch_number = 25, batch_size = 48):
+    def train(self, train_dataset, val_dataset, epoch_number = 25, batch_size = 48, fname = 'WGAN'):
 
         for p in self.gen.parameters():
             p.requires_grad = True
+            
+        wandb.init(project="CT-Denoise", reinit=True)
+        wandb.run.name = fname.split("/")[-1]
+        wandb.run.save()
+        wandb.watch(self.gen)
+        wandb.config.update({'epochs':epoch_number, 'batch_size':batch_size, 'lr':2e-4, 'betas':(0.5, 0.99)})
 
-        dataloader, valloader = self._prepare_training_data(x, y, thickness=thickness, bsize=batch_size)
-        disc = self._disc().to(self.device)
-
+        dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
+        valloader = DataLoader(dataset=val_dataset, batch_size=batch_size, shuffle=True)
+        
+        disc = gan_3d._disc().to(self.device)
+        
         params = sum([np.prod(p.size()) for p in disc.parameters()])
         print('Number of params in discriminator: %d'%(params))
 
         optim_gen = optim.Adam(list(self.gen.parameters()) + list(disc.parameters()), lr=2e-4, betas=(0.5, 0.99))
+        vgg_loss_fn = self._VGGLoss()
 
         #%%Train branch
         for epoch in range(epoch_number):
-            running_loss = 0
-            val_loss = 0
+            
+            l1_loss = 0
+            mse_loss = 0
+            vgg_loss = 0
+            ssim = 0
+            
             self.gen.train() 
             disc.train() 
 
@@ -159,8 +174,8 @@ class gan_3d(model):
                 fake_res = disc(outputs1).squeeze()
                 real_res = disc(phantom_in).squeeze()
 
-                #Calculate perceptual loss
-                mse_loss = nn.MSELoss()(outputs1, phantom_in)
+                #Calculate loss
+                mse_loss = nn.L1Loss()(phantom_in, outputs1) + (1 - pytorch_ssim.SSIM()(phantom_in.squeeze(1), outputs1.squeeze(1)))
                 fake_loss = nn.BCELoss()(fake_res, torch.zeros(phantom_in.shape[0]).cuda())
                 real_loss = nn.BCELoss()(real_res, torch.ones(phantom_in.shape[0]).cuda())
                 adv_loss = nn.BCELoss()(fake_res, torch.ones(phantom_in.shape[0]).cuda())
@@ -172,15 +187,7 @@ class gan_3d(model):
                 #Backprop and update
                 loss.backward()
                 optim_gen.step()
-
-                # print statistics
-                running_loss += loss.item()
-
-                #Clear memory
-                #del phantom_in
-                #del noisy_in
-                #torch.cuda.empty_cache()
-
+                
             #Val step
             self.gen.eval()
             disc.eval()
@@ -199,26 +206,23 @@ class gan_3d(model):
 
                 #Forward pass in the validation phase
                 with torch.no_grad():
+                    
                     outputs1 = self.gen(noisy_in)
 
-                #Calculate perceptual loss
-                loss = nn.MSELoss()(outputs1, phantom_in) 
+                    l1_loss += nn.L1Loss()(phantom_in, outputs1)
+                    mse_loss += nn.MSELoss()(phantom_in, outputs1)
+                    ssim += pytorch_ssim.SSIM()(phantom_in.squeeze(1), outputs1.squeeze(1))
+                    vgg_loss += vgg_loss_fn(phantom_in[:, :, 2], outputs1[:, :, 2])
 
-                # print statistics
-                val_loss += loss.item()
-
-                #Clear memory
-                #del phantom_in
-                #del noisy_in
-                #torch.cuda.empty_cache()
-
-            print('[%d, %5d] train_loss: %.3f val_loss: %.3f' %
-                    (epoch + 1, i + 1, running_loss / int(i+1), val_loss / int(j+1) ))
-            running_loss = 0.0
-            val_loss = 0.0
             end = time.time()
             print('Time taken for epoch: '+str(end-start)+' seconds')
-            #scheduler.step()
+
+            wandb.log({
+                'l1_loss':l1_loss/(j+1),
+                'mse_loss':mse_loss/(j+1),
+                'vgg_loss':vgg_loss/(j+1),
+                'ssim':ssim/(j+1)
+            })
 
             if (epoch+1)%5 == 0:
                 print('Saving model...')
@@ -226,5 +230,5 @@ class gan_3d(model):
                 torch.save(disc.state_dict(), fname+'_disc_'+str(epoch+1)+'.pth')
 
         print('Training complete!')
-
+        wandb.run.finish()
 #%%

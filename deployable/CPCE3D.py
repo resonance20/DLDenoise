@@ -66,7 +66,7 @@ class cpce3d(wgan_vgg):
 
             return out
 
-    def infer(self, x, fname = 'deployable/CPCE3D_gen_30.pth'):
+    def _infer(self, x, fname = 'deployable/CPCE3D_gen_30.pth'):
 
         self.gen.load_state_dict(torch.load(fname))
 

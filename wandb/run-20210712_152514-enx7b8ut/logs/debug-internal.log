@@ -1,0 +1,88 @@
+2021-07-12 15:25:16,547 INFO    MainThread:22412 [internal.py:wandb_internal():91] W&B internal server running at pid: 22412, started at: 2021-07-12 15:25:16.538831
+2021-07-12 15:25:16,550 INFO    WriterThread:22412 [datastore.py:open_for_write():80] open: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\run-enx7b8ut.wandb
+2021-07-12 15:25:16,551 DEBUG   HandlerThread:22412 [handler.py:handle_request():124] handle_request: check_version
+2021-07-12 15:25:16,561 DEBUG   SenderThread:22412 [sender.py:send():179] send: header
+2021-07-12 15:25:16,561 DEBUG   SenderThread:22412 [sender.py:send_request():193] send_request: check_version
+2021-07-12 15:25:16,681 DEBUG   SenderThread:22412 [sender.py:send():179] send: run
+2021-07-12 15:25:17,136 INFO    SenderThread:22412 [dir_watcher.py:__init__():168] watching files in: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files
+2021-07-12 15:25:17,137 INFO    SenderThread:22412 [sender.py:_start_run_threads():719] run started: enx7b8ut with start time 1626096314
+2021-07-12 15:25:17,137 DEBUG   SenderThread:22412 [sender.py:send():179] send: summary
+2021-07-12 15:25:17,137 DEBUG   HandlerThread:22412 [handler.py:handle_request():124] handle_request: run_start
+2021-07-12 15:25:17,164 INFO    SenderThread:22412 [sender.py:_save_file():841] saving file wandb-summary.json with policy end
+2021-07-12 15:25:18,139 INFO    Thread-12 :22412 [dir_watcher.py:_on_file_created():216] file/dir created: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\wandb-summary.json
+2021-07-12 15:25:23,478 INFO    Thread-12 :22412 [dir_watcher.py:_on_file_created():216] file/dir created: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\output.log
+2021-07-12 15:25:25,481 INFO    Thread-12 :22412 [dir_watcher.py:_on_file_modified():229] file/dir modified: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\output.log
+2021-07-12 15:25:27,697 DEBUG   HandlerThread:22412 [meta.py:__init__():39] meta init
+2021-07-12 15:25:27,698 DEBUG   HandlerThread:22412 [meta.py:__init__():53] meta init done
+2021-07-12 15:25:27,698 DEBUG   HandlerThread:22412 [meta.py:probe():210] probe
+2021-07-12 15:25:27,706 DEBUG   HandlerThread:22412 [meta.py:_setup_git():200] setup git
+2021-07-12 15:25:28,067 DEBUG   HandlerThread:22412 [meta.py:_setup_git():207] setup git done
+2021-07-12 15:25:28,067 DEBUG   HandlerThread:22412 [meta.py:_save_pip():57] save pip
+2021-07-12 15:25:28,074 DEBUG   HandlerThread:22412 [meta.py:_save_pip():71] save pip done
+2021-07-12 15:25:28,074 DEBUG   HandlerThread:22412 [meta.py:_save_conda():78] save conda
+2021-07-12 15:25:28,083 ERROR   HandlerThread:22412 [meta.py:_save_conda():85] Error saving conda packages
+Traceback (most recent call last):
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\site-packages\wandb\sdk\internal\meta.py", line 83, in _save_conda
+    subprocess.call(["conda", "env", "export"], stdout=f)
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\subprocess.py", line 304, in call
+    with Popen(*popenargs, **kwargs) as p:
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\subprocess.py", line 756, in __init__
+    restore_signals, start_new_session)
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\subprocess.py", line 1155, in _execute_child
+    startupinfo)
+FileNotFoundError: [WinError 2] Das System kann die angegebene Datei nicht finden
+2021-07-12 15:25:28,093 DEBUG   HandlerThread:22412 [meta.py:_save_conda():86] save conda done
+2021-07-12 15:25:28,093 DEBUG   HandlerThread:22412 [meta.py:probe():252] probe done
+2021-07-12 15:25:28,108 DEBUG   HandlerThread:22412 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:25:28,108 DEBUG   SenderThread:22412 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:25:28,302 DEBUG   SenderThread:22412 [sender.py:send():179] send: run
+2021-07-12 15:25:28,482 INFO    Thread-12 :22412 [dir_watcher.py:_on_file_modified():229] file/dir modified: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\config.yaml
+2021-07-12 15:25:28,483 INFO    Thread-12 :22412 [dir_watcher.py:_on_file_created():216] file/dir created: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\requirements.txt
+2021-07-12 15:25:28,483 INFO    Thread-12 :22412 [dir_watcher.py:_on_file_created():216] file/dir created: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\conda-environment.yaml
+2021-07-12 15:25:28,483 INFO    Thread-12 :22412 [dir_watcher.py:_on_file_created():216] file/dir created: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\wandb-metadata.json
+2021-07-12 15:25:28,681 INFO    SenderThread:22412 [sender.py:send_run():618] updated run: enx7b8ut
+2021-07-12 15:25:28,681 DEBUG   SenderThread:22412 [sender.py:send():179] send: files
+2021-07-12 15:25:28,682 INFO    SenderThread:22412 [sender.py:_save_file():841] saving file wandb-metadata.json with policy now
+2021-07-12 15:25:29,308 INFO    Thread-17 :22412 [upload_job.py:push():137] Uploaded file C:\Users\z003zv1a\AppData\Local\Temp\tmpmr63tic1wandb\378bnslf-wandb-metadata.json
+2021-07-12 15:25:34,651 DEBUG   SenderThread:22412 [sender.py:send():179] send: files
+2021-07-12 15:25:34,652 INFO    SenderThread:22412 [sender.py:_save_file():841] saving file media\graph\graph_0_summary_a59ac54db1effde9164e.graph.json with policy now
+2021-07-12 15:25:34,653 DEBUG   SenderThread:22412 [sender.py:send():179] send: summary
+2021-07-12 15:25:34,657 INFO    SenderThread:22412 [sender.py:_save_file():841] saving file wandb-summary.json with policy end
+2021-07-12 15:25:35,255 INFO    Thread-18 :22412 [upload_job.py:push():137] Uploaded file C:\Users\z003zv1a\AppData\Local\Temp\tmpmr63tic1wandb\2pq7m9nh-media/graph/graph_0_summary_a59ac54db1effde9164e.graph.json
+2021-07-12 15:25:35,491 INFO    Thread-12 :22412 [dir_watcher.py:_on_file_modified():229] file/dir modified: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\wandb-summary.json
+2021-07-12 15:25:35,492 INFO    Thread-12 :22412 [dir_watcher.py:_on_file_modified():229] file/dir modified: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\output.log
+2021-07-12 15:25:35,492 INFO    Thread-12 :22412 [dir_watcher.py:_on_file_created():216] file/dir created: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\media\graph\graph_0_summary_a59ac54db1effde9164e.graph.json
+2021-07-12 15:25:35,492 INFO    Thread-12 :22412 [dir_watcher.py:_on_file_created():216] file/dir created: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\media
+2021-07-12 15:25:35,493 INFO    Thread-12 :22412 [dir_watcher.py:_on_file_created():216] file/dir created: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\media\graph
+2021-07-12 15:25:43,304 DEBUG   HandlerThread:22412 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:25:43,305 DEBUG   SenderThread:22412 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:25:43,502 INFO    Thread-12 :22412 [dir_watcher.py:_on_file_modified():229] file/dir modified: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\output.log
+2021-07-12 15:25:51,519 INFO    Thread-12 :22412 [dir_watcher.py:_on_file_modified():229] file/dir modified: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\output.log
+2021-07-12 15:25:58,522 DEBUG   HandlerThread:22412 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:25:58,523 DEBUG   SenderThread:22412 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:26:00,172 DEBUG   SenderThread:22412 [sender.py:send():179] send: stats
+2021-07-12 15:26:03,416 DEBUG   HandlerThread:22412 [handler.py:handle_request():124] handle_request: pause
+2021-07-12 15:26:03,416 INFO    HandlerThread:22412 [handler.py:handle_request_pause():525] stopping system metrics thread
+2021-07-12 15:26:03,476 DEBUG   SenderThread:22412 [sender.py:send():179] send: stats
+2021-07-12 15:26:03,559 INFO    Thread-12 :22412 [dir_watcher.py:_on_file_modified():229] file/dir modified: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\output.log
+2021-07-12 15:26:06,515 WARNING MainThread:22412 [internal.py:is_dead():367] Internal process exiting, parent pid 18200 disappeared
+2021-07-12 15:26:06,515 ERROR   MainThread:22412 [internal.py:wandb_internal():143] Internal process shutdown.
+2021-07-12 15:26:07,515 INFO    SenderThread:22412 [sender.py:finish():945] shutting down sender
+2021-07-12 15:26:07,515 INFO    WriterThread:22412 [datastore.py:close():288] close: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\run-enx7b8ut.wandb
+2021-07-12 15:26:07,515 INFO    HandlerThread:22412 [handler.py:finish():638] shutting down handler
+2021-07-12 15:26:07,515 INFO    SenderThread:22412 [dir_watcher.py:finish():282] shutting down directory watcher
+2021-07-12 15:26:07,563 INFO    SenderThread:22412 [dir_watcher.py:finish():312] scan: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files
+2021-07-12 15:26:07,563 INFO    SenderThread:22412 [dir_watcher.py:finish():318] scan save: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\conda-environment.yaml conda-environment.yaml
+2021-07-12 15:26:07,564 INFO    SenderThread:22412 [dir_watcher.py:finish():318] scan save: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\config.yaml config.yaml
+2021-07-12 15:26:07,564 INFO    SenderThread:22412 [dir_watcher.py:finish():318] scan save: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\output.log output.log
+2021-07-12 15:26:07,565 INFO    SenderThread:22412 [dir_watcher.py:finish():318] scan save: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\requirements.txt requirements.txt
+2021-07-12 15:26:07,570 INFO    SenderThread:22412 [dir_watcher.py:finish():318] scan save: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\wandb-metadata.json wandb-metadata.json
+2021-07-12 15:26:07,573 INFO    SenderThread:22412 [dir_watcher.py:finish():318] scan save: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\wandb-summary.json wandb-summary.json
+2021-07-12 15:26:07,583 INFO    SenderThread:22412 [dir_watcher.py:finish():318] scan save: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\media\graph\graph_0_summary_a59ac54db1effde9164e.graph.json media\graph\graph_0_summary_a59ac54db1effde9164e.graph.json
+2021-07-12 15:26:07,583 INFO    SenderThread:22412 [file_pusher.py:finish():177] shutting down file pusher
+2021-07-12 15:26:07,583 INFO    SenderThread:22412 [file_pusher.py:join():182] waiting for file pusher
+2021-07-12 15:26:08,146 INFO    Thread-19 :22412 [upload_job.py:push():137] Uploaded file c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\config.yaml
+2021-07-12 15:26:08,151 INFO    Thread-20 :22412 [upload_job.py:push():137] Uploaded file c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\output.log
+2021-07-12 15:26:08,181 INFO    Thread-21 :22412 [upload_job.py:push():137] Uploaded file c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\requirements.txt
+2021-07-12 15:26:08,246 INFO    Thread-22 :22412 [upload_job.py:push():137] Uploaded file c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152514-enx7b8ut\files\wandb-summary.json
+2021-07-12 15:26:08,730 INFO    MainThread:22412 [internal.py:handle_exit():78] Internal process exited

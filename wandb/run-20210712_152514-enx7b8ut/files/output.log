@@ -1,0 +1,5 @@
+
+wandb: WARNING Calling run.save without any arguments is deprecated.Changes to attributes are automatically persisted.
+tensor(0.0034, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0070, device='cuda:0', grad_fn=<MeanBackward0>)
+tensor(0.0125, device='cuda:0', grad_fn=<MeanBackward0>)

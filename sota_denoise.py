@@ -15,7 +15,6 @@ import torch.nn.functional as F
 
 from skimage.external import tifffile as tif
 from helpers import *
-from architectures import *
 
 #%%Read and save LDCT challenge as .tiff files
 ltime = time.time()
@@ -130,7 +129,7 @@ for patient in list_patients:
         for ind in range(4, noisy_data_pad.shape[2] - 10, 7):
             
             im_cuda_rl = noisy_data_pad[:, :, ind : ind + 7, :, :]
-            im_cuda_g = noisy_data_pad[:, :, ind - 4 : ind + 11, :, :]
+            im_cuda_g = noisy_data_pad[:, :, ind - 4 : +ind + 11, :, :]
             im_cuda_jbf = im_cuda_rl.clone()
 
             sigma_i = np.zeros(im_cuda_rl.shape[2:]) + 10
@@ -299,7 +298,75 @@ for patient in list_patients:
 print('Time taken to denoise and save: %f seconds'%(time.time() - ltime))
 
 
-# %%Denoise using SOTA methods
+# %%Denoise TCIA using SOTA methods
+import time
+import pandas as pd
+
+%reload_ext autoreload
+%autoreload 2
+import os
+os.chdir('../analysis')
+from deployable.QAE import quadratic_autoencoder
+from deployable.WGAN_VGG import wgan_vgg
+from deployable.GAN import gan_3d
+from deployable.CPCE3D import cpce3d
+from deployable.JBFnet import jbfnet
+from deployable.CNN import cnn
+from deployable.REDCNN import red_cnn
+from deployable.RLDN import rldn
+from deployable.BM3D import bm3d_dl
+
+
+model_wgan = wgan_vgg()
+model_qae = quadratic_autoencoder()
+model_cpce3d = cpce3d()
+model_cnn = cnn()
+model_gan = gan_3d()
+model_redcnn = red_cnn()
+model_jbfnet = jbfnet()
+model_bm3d = bm3d_dl()
+model_rldn = rldn()
+step_cnter = pd.DataFrame()
+ltime = time.time()
+dir = '../reconstucted_ims/Images/TCIAdataset/'
+
+newdir = os.path.join(dir, 'abdomen_scan', 'LDCT-and-Projection-data')
+list_patients = os.listdir(newdir)
+for patient in list_patients:
+    if '.' not in patient:
+        print(patient)
+        imdir = os.path.join(newdir, patient, os.listdir(os.path.join(newdir, patient))[0])
+        dirs = os.listdir(imdir)
+        for dir_set in dirs:
+            if 'Low' in dir_set:
+                noisy_data = os.path.join(imdir, dir_set)
+                model_cnn.denoise_dicom(in_folder=noisy_data, series_description='CNN10', \
+                    out_folder=os.path.join(imdir, 'CNN10'), fname='deployable/CNN10/CNN_SMN_50.pth')
+                model_wgan.denoise_dicom(in_folder=noisy_data, series_description='WGAN_VGG', \
+                    out_folder=os.path.join(imdir, 'WGAN_VGG'), fname='deployable/WGAN_VGG/WGAN_SMN_gen_100.pth')
+                model_qae.denoise_dicom(in_folder=noisy_data, series_description='QAE', \
+                    out_folder=os.path.join(imdir, 'QAE'), fname='deployable/QAE/QAE_SMN_50.pth')
+                model_gan.denoise_dicom(in_folder=noisy_data, series_description='GAN3D', \
+                    out_folder=os.path.join(imdir, 'GAN3D'), fname='deployable/GAN3D/GAN3D_SMN_gen_100.pth')
+                model_cpce3d.denoise_dicom(in_folder=noisy_data, series_description='CPCE3D', \
+                    out_folder=os.path.join(imdir, 'CPCE3D'), fname='deployable/CPCE3D/CPCE3D_SMN_gen_100.pth')
+                model_redcnn.denoise_dicom(in_folder=noisy_data, series_description='REDCNN', \
+                    out_folder=os.path.join(imdir, 'REDCNN'), fname='deployable/REDCNN/REDCNN_SMN_50.pth')
+                model_jbfnet.denoise_dicom(in_folder=noisy_data, series_description='JBFnet', \
+                    out_folder=os.path.join(imdir, 'JBFnet'), fname='deployable/JBFnet/JBFnet_SMN_gen_40.pth')
+                """ 
+                for num_steps in range(10, 16):
+                    model_rldn.denoise_dicom(in_folder=noisy_data, series_description='RLDN_Mid_'+str(num_steps), \
+                                out_folder=os.path.join(imdir, 'RLDN_Mid', 'RLDN_' + str(num_steps)), fname=['../denoise_rl/models/RL3D_2domain/RLnetRainbow_20.pth',\
+                                    '../denoise_rl/models/RL3D_2domain/RLnetRainbowProj_20.pth'], num_steps=num_steps)
+                model_bm3d.denoise_dicom(in_folder=noisy_data, series_description='BM3D', \
+                    out_folder=os.path.join(imdir, 'BM3D'), fname=None)
+                """
+        print('Completed '+patient)
+print('Time taken to denoise using SOTA: %.3f seconds'%(time.time() - ltime))
+
+# %% Denoise test using SOTA methods
+
 import time
 
 from deployable.QAE import quadratic_autoencoder
@@ -309,6 +376,68 @@ from deployable.CPCE3D import cpce3d
 from deployable.JBFnet import jbfnet
 from deployable.CNN import cnn
 from deployable.REDCNN import red_cnn
+from deployable.RLDN import rldn
+"""
+model_wgan = wgan_vgg()
+model_qae = quadratic_autoencoder()
+model_cpce3d = cpce3d()
+model_cnn = cnn()
+model_gan = gan_3d()
+model_redcnn = red_cnn()
+model_jbfnet = jbfnet()
+"""
+model_rldn = rldn()
+ltime = time.time()
+dir = '../reconstucted_ims/test/'
+
+list_patients = os.listdir(dir)
+for patient in list_patients:
+    if '.' not in patient:
+        print(patient)
+        imdir = os.path.join(dir, patient)
+        dirs = os.listdir(imdir)
+        for dir_set in dirs:
+            if 'WFBP' in dir_set and os.path.isdir(os.path.join(imdir, dir_set)):
+                noisy_datasets = os.path.join(imdir, dir_set)
+                for dataset in os.listdir(noisy_datasets):
+                    if os.path.isdir(os.path.join(noisy_datasets, dataset)) and '100' not in dataset:
+                        noisy_data = os.path.join(noisy_datasets, dataset)
+                        """
+                        model_cnn.denoise_dicom(in_folder=noisy_data, series_description='CNN10', \
+                            out_folder=os.path.join(imdir, dataset.split('_')[0]+'_CNN10'), fname='deployable/CNN10/CNN_SMN_50.pth')
+                        model_wgan.denoise_dicom(in_folder=noisy_data, series_description='WGAN_VGG', \
+                            out_folder=os.path.join(imdir, dataset.split('_')[0]+'_WGAN_VGG'), fname='deployable/WGAN_VGG/WGAN_SMN_gen_100.pth')
+                        model_qae.denoise_dicom(in_folder=noisy_data, series_description='QAE', \
+                            out_folder=os.path.join(imdir, dataset.split('_')[0]+'_QAE'), fname='deployable/QAE/QAE_SMN_50.pth')
+                        model_gan.denoise_dicom(in_folder=noisy_data, series_description='GAN3D', \
+                            out_folder=os.path.join(imdir, dataset.split('_')[0]+'_GAN3D'), fname='deployable/GAN3D/GAN3D_SMN_gen_100.pth')
+                        model_cpce3d.denoise_dicom(in_folder=noisy_data, series_description='CPCE3D', \
+                            out_folder=os.path.join(imdir, dataset.split('_')[0]+'_CPCE3D'), fname='deployable/CPCE3D/CPCE3D_SMN_gen_100.pth')
+                        model_redcnn.denoise_dicom(in_folder=noisy_data, series_description='REDCNN', \
+                            out_folder=os.path.join(imdir, dataset.split('_')[0]+'_REDCNN'), fname='deployable/REDCNN/REDCNN_SMN_50.pth')
+                        model_jbfnet.denoise_dicom(in_folder=noisy_data, series_description='JBFnet', \
+                            out_folder=os.path.join(imdir, dataset.split('_')[0]+'_JBFnet'), fname='deployable/JBFnet/JBFnet_SMN_gen_40.pth')
+                        """
+                        if '75' not in dataset:
+                            model_rldn.denoise_dicom(in_folder=noisy_data, series_description='RLDN', \
+                                out_folder=os.path.join(imdir, dataset.split('_')[0]+'_RLDN'), fname=['../denoise_rl/models/RL3D_2domain/RLnetRainbow_20.pth',\
+                                    '../denoise_rl/models/RL3D_2domain/RLnetRainbowProj_20.pth'])                      
+        print('Completed '+patient)
+        
+    
+print('Time taken to denoise using SOTA: %.3f seconds'%(time.time() - ltime))
+# %% Denoise task using SOTA methods
+
+import time
+
+from deployable.QAE import quadratic_autoencoder
+from deployable.WGAN_VGG import wgan_vgg
+from deployable.GAN import gan_3d
+from deployable.CPCE3D import cpce3d
+from deployable.JBFnet import jbfnet
+from deployable.CNN import cnn
+from deployable.REDCNN import red_cnn
+from deployable.RLDN import rldn
 
 model_wgan = wgan_vgg()
 model_qae = quadratic_autoencoder()
@@ -316,30 +445,41 @@ model_cpce3d = cpce3d()
 model_cnn = cnn()
 model_gan = gan_3d()
 model_redcnn = red_cnn()
-#model_jbfnet = jbfnet()
+model_jbfnet = jbfnet()
+model_rldn = rldn()
 ltime = time.time()
-dir = '../reconstucted_ims/Images/TCIAdataset/'
-#list_locs = os.listdir(dir)
-#for loc in list_locs:
-newdir = os.path.join(dir, 'abdomen_scan', 'LDCT-and-Projection-data')
-list_patients = os.listdir(newdir)
+dir = '../reconstucted_ims/test/DetectionTask'
+
+list_patients = os.listdir(dir)
 for patient in list_patients:
     if '.' not in patient:
-        noisy_data = np.array(tif.imread(os.path.join(newdir, patient, 'quarter_ds.tiff')), dtype=np.int16)
-        #clean_wgan = model_wgan.infer(noisy_data, fname='deployable/WGAN_VGG/WGAN_AAPM_gen_100.pth')
-        #clean_qae = model_qae.infer(noisy_data, fname='deployable/QAE/QAE_AAPM_25.pth')
-        clean_gan = model_gan.infer(noisy_data, fname='deployable/GAN3D/GAN3D_AAPM_gen_100.pth')
-        #clean_cpce = model_cpce3d.infer(noisy_data, fname='deployable/CPCE3D/CPCE3D_AAPM_gen_100.pth')
-        #clean_cnn = model_cnn.infer(noisy_data, fname='deployable/CNN10/CNN_AAPM_30.pth')
-        #clean_redcnn = model_redcnn.infer(noisy_data, fname='deployable/REDCNN/REDCNN_AAPM_30.pth')
-        #clean_jbfnet = model_jbfnet.infer(noisy_data)
-        #tif.imsave(os.path.join(newdir, patient, 'wgan_vgg.tiff'), np.array(clean_wgan, dtype=np.uint16))
-        #tif.imsave(os.path.join(newdir, patient, 'qae.tiff'), np.array(clean_qae, dtype=np.uint16))
-        #tif.imsave(os.path.join(newdir, patient, 'cpce3d.tiff'), np.array(clean_cpce, dtype=np.uint16))
-        #tif.imsave(os.path.join(newdir, patient, 'cnn.tiff'), np.array(clean_cnn, dtype=np.uint16))
-        #tif.imsave(os.path.join(newdir, patient, 'redcnn.tiff'), np.array(clean_redcnn, dtype=np.uint16))
-        tif.imsave(os.path.join(newdir, patient, 'gan.tiff'), np.array(clean_gan, dtype=np.uint16))
-        #tif.imsave(os.path.join(newdir, patient, 'jbfnet.tiff'), np.array(clean_jbfnet, dtype=np.uint16))
+        print(patient)
+        imdir = os.path.join(dir, patient)
+        dirs = os.listdir(imdir)
+        for dataset in dirs:
+            if 'Low' in dataset and os.path.isdir(os.path.join(imdir, dataset)):
+                    noisy_data = os.path.join(imdir, dataset)
+                    
+                    model_cnn.denoise_dicom(in_folder=noisy_data, series_description='CNN10', \
+                        out_folder=os.path.join(imdir, 'CNN10'), fname='deployable/CNN10/CNN_SMN_50.pth')
+                    model_wgan.denoise_dicom(in_folder=noisy_data, series_description='WGAN_VGG', \
+                        out_folder=os.path.join(imdir, 'WGAN_VGG'), fname='deployable/WGAN_VGG/WGAN_SMN_gen_100.pth')
+                    model_qae.denoise_dicom(in_folder=noisy_data, series_description='QAE', \
+                        out_folder=os.path.join(imdir, 'QAE'), fname='deployable/QAE/QAE_SMN_50.pth')
+                    model_gan.denoise_dicom(in_folder=noisy_data, series_description='GAN3D', \
+                        out_folder=os.path.join(imdir, 'GAN3D'), fname='deployable/GAN3D/GAN3D_SMN_gen_100.pth')
+                    model_cpce3d.denoise_dicom(in_folder=noisy_data, series_description='CPCE3D', \
+                        out_folder=os.path.join(imdir, 'CPCE3D'), fname='deployable/CPCE3D/CPCE3D_SMN_gen_100.pth')
+                    model_redcnn.denoise_dicom(in_folder=noisy_data, series_description='REDCNN', \
+                        out_folder=os.path.join(imdir, 'REDCNN'), fname='deployable/REDCNN/REDCNN_SMN_50.pth')
+                    model_jbfnet.denoise_dicom(in_folder=noisy_data, series_description='JBFnet', \
+                        out_folder=os.path.join(imdir, 'JBFnet'), fname='deployable/JBFnet/JBFnet_SMN_gen_40.pth')
+                    model_rldn.denoise_dicom(in_folder=noisy_data, series_description='RLDN', \
+                        out_folder=os.path.join(imdir, 'RLDN'), fname=['../denoise_rl/models/RL3D_2domain/RLnetRainbow_20.pth',\
+                            '../denoise_rl/models/RL3D_2domain/RLnetRainbowProj_20.pth'])                      
+        print('Completed '+patient)
+        
+    
+print('Time taken to denoise using SOTA: %.3f seconds'%(time.time() - ltime))# %%
 
-print('Time taken to denoise using SOTA: %.3f seconds'%(time.time() - ltime))
 # %%

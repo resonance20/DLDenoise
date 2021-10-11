@@ -1,5 +1,8 @@
 #%%Imports
 import os
+import natsort
+os.chdir('../')
+
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,12 +10,14 @@ import time
 import math
 import pandas as pd
 import ast
+from dicom_processing.helpers import read_dicom_folder
+os.chdir('analysis')
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from scipy.stats import ttest_ind, ttest_rel
+from scipy.stats import ttest_ind, ttest_rel, wilcoxon
 from skimage.external import tifffile as tif
 from skimage.metrics import structural_similarity
 
@@ -29,8 +34,8 @@ ltime = time.time()
 clipping_ud=54
 clipping_lr=22
 relevant_window = [864, 1264]
-#columns = ['quarter_ds', 'gan', 'cpce3d', 'wgan_vgg', 'qae', 'redcnn', 'cnn']
-columns = ['rldn', 'rldn_onlysin', 'rldn_onlyvol', 'rldn_fixsin', 'rldn_fixvol', 'rldn_fix', 'rldngt']
+columns = ['quarter_ds', 'gan', 'cpce3d', 'wgan_vgg', 'qae', 'redcnn', 'cnn']
+#columns = ['rldn', 'rldn_onlysin', 'rldn_onlyvol', 'rldn_fixsin', 'rldn_fixvol', 'rldn_fix', 'rldngt']
 dir = '../reconstucted_ims/Images/TCIAdataset/abdomen_scan/LDCT-and-Projection-data'
 
 list_patients = os.listdir(dir)
@@ -95,7 +100,7 @@ dir = '../reconstucted_ims/Images/TCIAdataset/abdomen_scan/LDCT-and-Projection-d
 data_frame = pd.read_excel(os.path.join(dir, 'data_sota.xlsx'))
 data_frame2 = pd.read_excel(os.path.join(dir, 'data_abla.xlsx'))
 
-mt_name = 'SSIM'
+mt_name = 'IRQM'
 m1 = extract_metric(data_frame, 'quarter_ds', mt_name)
 m2 = extract_metric(data_frame2, 'rldn_onlysin', mt_name)
 m3 = extract_metric(data_frame2, 'rldn_onlyvol', mt_name)
@@ -116,6 +121,22 @@ print("Mean: %.4f  Std. Dev.: %.4f"%(np.mean(m8), np.std(m8)) )
 
 plt.rcParams.update({'font.size': 18})
 plt.figure(figsize=(10, 10))
+plt.title('PSNR Distribution')
+plt.xlabel('PSNR (dB)')
+plt.ylabel('Number of volumes')
+plt.grid(which='both', axis='both')
+range_val = [0.626,0.636]
+bins = 20
+m,x,_ = plt.hist(m1, bins=bins, range=range_val, edgecolor='black', linewidth=1.2, label='Quarter Dose')
+m2,x2,_ = plt.hist(m8, bins=bins, range=range_val, edgecolor='black', linewidth=1.2, label='Denoised')
+centers = 0.5*(x[1:] + x[:-1])
+plt.plot(centers, m)
+plt.legend()
+plt.show()
+
+"""
+plt.rcParams.update({'font.size': 18})
+plt.figure(figsize=(10, 10))
 plt.xlim(0.5, 7.5)
 #plt.plot(np.linspace(1, 7, num = 7), \
 #    [np.median(m1), np.median(m2), np.median(m3), np.median(m4), np.median(m5), np.median(m6), np.median(m7)])
@@ -130,35 +151,36 @@ plt.xticks(ticks = np.linspace(1, 7, num = 7), labels=['GAN3D', 'CPCE\n3D', 'WGA
 plt.ylabel(mt_name)
 plt.grid(which='both', axis = 'both')
 plt.show()
+"""
 
 # %%Statistical testing
 dir = '../reconstucted_ims/Images/TCIAdataset/abdomen_scan/LDCT-and-Projection-data'
 df1 = pd.read_excel(os.path.join(dir, 'data_sota.xlsx'))
 df2 = pd.read_excel(os.path.join(dir, 'data_abla.xlsx'))
-comp_par = ['rldngt', 'rldn']
+comp_par = ['wgan_vgg', 'rldn']
 #irqm1 = extract_metric(df2, comp_par[0], 'IRQM')
 #irqm2 = extract_metric(df2, comp_par[1], 'IRQM')
 
 #t, p = ttest_rel(irqm1, irqm2)
 
-ssim1 = extract_metric(df2, comp_par[0], 'SSIM')
+ssim1 = extract_metric(df1, comp_par[0], 'SSIM')
 ssim2 = extract_metric(df2, comp_par[1], 'SSIM')
 
-t2, p2 = ttest_rel(ssim1, ssim2)
+t2, p2 = wilcoxon(ssim1, ssim2)
 
-psnr1 = extract_metric(df2, comp_par[0], 'PSNR')
+psnr1 = extract_metric(df1, comp_par[0], 'PSNR')
 psnr2 = extract_metric(df2, comp_par[1], 'PSNR')
 
-t3, p3 = ttest_rel(psnr1, psnr2)
+t3, p3 = wilcoxon(psnr1, psnr2)
 
 #print("IRQM t: %.4f p: %.4f"%(t, p) )
-print("SSIM t: %.4f p: %.4f"%(t2, p2) )
-print("PSNR t: %.4f p: %.4f"%(t3, p3) )
+print(str.format("SSIM t: {0:.4}",t2) + str.format("p: {0:.4}", p2) )
+print(str.format("PSNR t: {0:.4}",t3) + str.format("p: {0:.4}", p3) )
 
 # %%SOTA comparison
 dir = '../reconstucted_ims/Images/TCIAdataset/abdomen_scan/LDCT-and-Projection-data/L049'
 
-num = 65
+num = 38
 im_quarter = tif.imread(os.path.join(dir, 'quarter_ds.tiff'))[num, :, :]
 im1 = tif.imread(os.path.join(dir, 'cpce3d.tiff'))[num, :, :]
 im2 = tif.imread(os.path.join(dir, 'gan.tiff'))[num, :, :]
@@ -170,9 +192,9 @@ im7 = tif.imread(os.path.join(dir, 'rlAbl', 'rldn.tiff'))[num, :, :]
 im_full = tif.imread(os.path.join(dir, 'full_ds.tiff'))[num, :, :]
 #print(psnr(im5, cv2.resize(im_full, (256,256)) ))
 
-plt.plot(np.sum(im_full, axis = 1))
-print(np.sum(im_full, axis = 1))
-plt.show()
+#plt.plot(np.sum(im_full, axis = 1))
+#print(np.sum(im_full, axis = 1))
+#plt.show()
 
 title = ['(a)LDCT', '(b)CPCE3D', '(c)GAN3D', '(d)WGAN-VGG', '(e)QAE', '(f)CNN10', '(g)REDCNN', '(h)RLDN', '(i)SDCT']
 im_array = [im_quarter, im1, im2, im3, im4, im5, im6, im7, im_full]
@@ -186,12 +208,12 @@ for i, axr in enumerate(axes):
         if (i*3 + j) >= len(im_array):
             ax.axis('off')
             break
-        im_s = im_array[i*3 + j][50:178, 80:208]
+        im_s = im_array[i*3 + j][50:178, 40:168]
         ax.axis('off')
         ax.imshow(window(im_s, centre=centre, width=width), cmap='gray')
         ax.set_title(title[i*3 + j] + ', SSIM=%.4f'%( \
            structural_similarity(window(im_s, centre=centre, width=width) , \
-               window(im_full[50:178, 80:208], centre=centre, width=width), data_range=width) ))
+               window(im_full[50:178, 40:168], centre=centre, width=width), data_range=width) ))
         #rect = patches.Rectangle((45,25),20,20,linewidth= 3 ,edgecolor='r',facecolor='none')
         #ax.add_patch(rect)
         #rect = patches.Rectangle((75,60),20,20,linewidth= 3 ,edgecolor='b',facecolor='none')
@@ -217,8 +239,8 @@ title = ['(a)LDCT', '(b)Only $filt_{sin}$', '(c)Only $filt_{vol}$', '(d)Fixed fi
     '(e)Fixed $filt_{sin}$', '(f)Fixed $filt_{vol}$', '(g)W/o $NET_{rew}$', '(h)RLDN', '(i)SDCT']
 im_array = [im_quarter, im1, im2, im3, im4, im5, im6, im7, im_full]
 
-centre = 50
-width = 150
+centre = 40
+width = 400
 plt.rcParams.update({'font.size': 30})
 fig, axes = plt.subplots(3, 3, figsize=(30, 30))
 for i, axr in enumerate(axes):
@@ -226,18 +248,19 @@ for i, axr in enumerate(axes):
         if (i*3 + j) >= len(im_array):
             ax.axis('off')
             break
-        im_s = im_array[i*3 + j][50:178, 80:208]
+        im_s = im_array[i*3 + j][80:208, 40:168]
         ax.axis('off')
         ax.imshow(window(im_s, centre=centre, width=width), cmap='gray')
         ax.set_title(title[i*3 + j] + ', SSIM=%.4f'%( \
            structural_similarity(window(im_s, centre=centre, width=width) , \
-               window(im_full[50:178, 80:208], centre=centre, width=width), data_range=width) ))
+               window(im_full[80:208, 40:168], centre=centre, width=width), data_range=width) ))
         #rect = patches.Rectangle((45,25),20,20,linewidth= 3 ,edgecolor='r',facecolor='none')
         #ax.add_patch(rect)
         #rect = patches.Rectangle((75,60),20,20,linewidth= 3 ,edgecolor='b',facecolor='none')
         #ax.add_patch(rect)
 fig.subplots_adjust(hspace=0.1, wspace=0.1)
 plt.show()
+
 
 
 # %%Head CT
@@ -267,12 +290,12 @@ for i, axr in enumerate(axes):
         if (i*3 + j) >= len(im_array):
             ax.axis('off')
             break
-        im_s = im_array[i*3 + j][70:198, 80:208]
+        im_s = im_array[i*3 + j][50:178, 80:208]
         ax.axis('off')
         ax.imshow(window(im_s, centre=centre, width=width), cmap='gray')
         ax.set_title(title[i*3 + j] + ', SSIM=%.4f'%( \
             structural_similarity(window(im_s, centre=centre, width=width), \
-               window(im_full[70:198, 80:208], centre=centre, width=width), data_range=width) ))
+               window(im_full[50:178, 80:208], centre=centre, width=width), data_range=width) ))
         #rect = patches.Rectangle((45,25),20,20,linewidth= 3 ,edgecolor='r',facecolor='none')
         #ax.add_patch(rect)
         #rect = patches.Rectangle((75,60),20,20,linewidth= 3 ,edgecolor='b',facecolor='none')
@@ -280,4 +303,65 @@ for i, axr in enumerate(axes):
 fig.subplots_adjust(hspace=0.1, wspace=0.0)
 plt.show()
 
+# %%Graph convergence
+dir = '../reconstucted_ims/Images/TCIAdataset/abdomen_scan/LDCT-and-Projection-data/L056/08-24-2018-17479'
+
+dir_mid = os.path.join(dir, 'RLDN_Mid')
+dir_max = os.path.join(dir, 'RLDN_Max')
+dir_min = os.path.join(dir, 'RLDN_Min')
+dir_rand = os.path.join(dir, 'RLDN_Rand')
+
+df_res = pd.DataFrame()
+
+gt = read_dicom_folder(os.path.join(dir, '1.000000-Full dose images-23968') )
+
+clipping_ud=54
+clipping_lr=22
+relevant_window = [864, 1264]
+
+gt = np.clip(gt, relevant_window[0], relevant_window[1])
+
+for i, iter in enumerate(natsort.natsorted(os.listdir(dir_mid))):
+
+    data_mid = np.clip(read_dicom_folder(os.path.join(dir_mid, iter)), relevant_window[0], relevant_window[1])
+    data_max = np.clip(read_dicom_folder(os.path.join(dir_max, iter)), relevant_window[0], relevant_window[1])
+    data_min = np.clip(read_dicom_folder(os.path.join(dir_min, iter)), relevant_window[0], relevant_window[1])
+    data_rand = np.clip(read_dicom_folder(os.path.join(dir_rand, iter)), relevant_window[0], relevant_window[1])
+
+    output_dict = {
+        'index': i + 1,
+        'fname': iter,
+        'PSNR_mid': psnr(gt, data_mid, data_range=relevant_window[1] - relevant_window[0], clipping_lr=clipping_lr, clipping_ud=clipping_ud),
+        'PSNR_max': psnr(gt, data_max, data_range=relevant_window[1] - relevant_window[0], clipping_lr=clipping_lr, clipping_ud=clipping_ud),
+        'PSNR_min': psnr(gt, data_min, data_range=relevant_window[1] - relevant_window[0], clipping_lr=clipping_lr, clipping_ud=clipping_ud),
+        'PSNR_rand': psnr(gt, data_rand, data_range=relevant_window[1] - relevant_window[0], clipping_lr=clipping_lr, clipping_ud=clipping_ud),
+        'SSIM_mid': ssim(gt, data_mid, data_range=relevant_window[1] - relevant_window[0], clipping_lr=clipping_lr, clipping_ud=clipping_ud),
+        'SSIM_max': ssim(gt, data_max, data_range=relevant_window[1] - relevant_window[0], clipping_lr=clipping_lr, clipping_ud=clipping_ud),
+        'SSIM_min': ssim(gt, data_min, data_range=relevant_window[1] - relevant_window[0], clipping_lr=clipping_lr, clipping_ud=clipping_ud),
+        'SSIM_rand': ssim(gt, data_rand, data_range=relevant_window[1] - relevant_window[0], clipping_lr=clipping_lr, clipping_ud=clipping_ud)
+    }
+
+    df_res = df_res.append(output_dict, ignore_index=True)
+
+df_res = df_res.set_index('index')
+
+for head in ('PSNR_mid', 'PSNR_max', 'PSNR_min', 'PSNR_rand'):
+    plt.plot(df_res[head], label=head, linestyle='--', marker='v')
+
+plt.legend(['PSNR_mid', 'PSNR_max', 'PSNR_min', 'PSNR_rand'])
+plt.grid(which='both', axis='both')
+plt.title('PSNR Transformation')
+plt.xlabel('Number of iterations')
+plt.ylabel('PSNR')
+plt.show()
+
+for head in ('SSIM_mid', 'SSIM_max', 'SSIM_min', 'SSIM_rand'):
+    plt.plot(df_res[head], label=head, linestyle='--', marker='v')
+
+plt.legend(['SSIM_mid', 'SSIM_max', 'SSIM_min', 'SSIM_rand'])
+plt.grid(which='both', axis='both')
+plt.title('SSIM Transformation')
+plt.xlabel('Number of iterations')
+plt.ylabel('SSIM')
+plt.show()
 # %%

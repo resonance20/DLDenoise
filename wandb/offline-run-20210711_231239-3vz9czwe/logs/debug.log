@@ -1,0 +1,24 @@
+2021-07-11 23:12:39,194 INFO    MainThread:7756 [wandb_setup.py:_flush():69] setting env: {}
+2021-07-11 23:12:39,194 INFO    MainThread:7756 [wandb_setup.py:_flush():69] setting login settings: {}
+2021-07-11 23:12:39,194 INFO    MainThread:7756 [wandb_setup.py:_flush():69] setting login settings: {'mode': 'offline'}
+2021-07-11 23:12:39,195 INFO    MainThread:7756 [wandb_init.py:_log_setup():337] Logging user logs to C:\Users\z003zv1a\Desktop\Code\analysis\wandb\offline-run-20210711_231239-3vz9czwe\logs\debug.log
+2021-07-11 23:12:39,195 INFO    MainThread:7756 [wandb_init.py:_log_setup():338] Logging internal logs to C:\Users\z003zv1a\Desktop\Code\analysis\wandb\offline-run-20210711_231239-3vz9czwe\logs\debug-internal.log
+2021-07-11 23:12:39,234 INFO    MainThread:7756 [wandb_init.py:init():370] calling init triggers
+2021-07-11 23:12:39,234 INFO    MainThread:7756 [wandb_init.py:init():377] wandb.init called with sweep_config: {}
+config: {}
+2021-07-11 23:12:39,234 INFO    MainThread:7756 [wandb_init.py:init():419] starting backend
+2021-07-11 23:12:39,234 INFO    MainThread:7756 [backend.py:_multiprocessing_setup():72] multiprocessing start_methods=spawn, using: spawn
+2021-07-11 23:12:39,234 INFO    MainThread:7756 [backend.py:ensure_launched():135] starting backend process...
+2021-07-11 23:12:39,469 INFO    MainThread:7756 [backend.py:ensure_launched():140] started backend process with pid: 14572
+2021-07-11 23:12:39,469 INFO    MainThread:7756 [wandb_init.py:init():424] backend started and connected
+2021-07-11 23:12:39,469 INFO    MainThread:7756 [wandb_init.py:init():472] updated telemetry
+2021-07-11 23:12:39,484 INFO    MainThread:7756 [wandb_init.py:init():529] starting run threads in backend
+2021-07-11 23:12:44,497 INFO    MainThread:7756 [wandb_run.py:_console_start():1623] atexit reg
+2021-07-11 23:12:44,497 INFO    MainThread:7756 [wandb_run.py:_redirect():1497] redirect: SettingsConsole.WRAP
+2021-07-11 23:12:44,497 INFO    MainThread:7756 [wandb_run.py:_redirect():1534] Wrapping output streams.
+2021-07-11 23:12:44,497 INFO    MainThread:7756 [wandb_run.py:_redirect():1558] Redirects installed.
+2021-07-11 23:12:44,497 INFO    MainThread:7756 [wandb_init.py:init():554] run started, returning control to user process
+2021-07-11 23:12:44,497 INFO    MainThread:7756 [wandb_watch.py:watch():40] Watching
+2021-07-11 23:12:49,287 INFO    MainThread:7756 [wandb_run.py:_atexit_cleanup():1593] got exitcode: 1
+2021-07-11 23:12:49,287 INFO    MainThread:7756 [wandb_run.py:_restore():1565] restore
+2021-07-11 23:12:54,690 INFO    MainThread:7756 [wandb_run.py:_wait_for_finish():1715] got exit ret: None

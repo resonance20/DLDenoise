@@ -1,15 +1,15 @@
 import os
 import numpy as np
-from sklearn.model_selection import train_test_split
 import time
 from abc import ABC, abstractmethod
 
 import torch
 import torch.nn as nn
-import torch.optim as optim
-import torch.autograd as autograd
 import torch.nn.functional as F
 import torch.utils.data
+import torchvision
+
+from deployable.dicom_helpers import read_dicom_folder, write_dicom_folder
 
 torch.backends.cudnn.deterministic=True
 torch.backends.cudnn.benchmark=True
@@ -22,44 +22,41 @@ class model(ABC):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.gen = None
 
-    def _prepare_training_data(self, x, y, thickness=1, bsize=48):
-        noisy_train, noisy_test, phantom_train, phantom_test = train_test_split(self._make_patches(x, thickness) , self._make_patches(y, thickness), train_size=0.95)
-        dataset = torch.utils.data.TensorDataset(self._torchify(phantom_train), self._torchify(noisy_train))
-        dataloader = torch.utils.data.DataLoader(dataset, batch_size=bsize, shuffle=True)
-        dataset = torch.utils.data.TensorDataset(self._torchify(phantom_test), self._torchify(noisy_test))
-        valloader = torch.utils.data.DataLoader(dataset, batch_size=bsize, shuffle=True)
-        return dataloader, valloader
-
-    def _make_patches3d(self, x, thickness, psize=64):
-        if x.shape[0]%thickness != 0:
-            pad_thickness = thickness - (x.shape[0]%thickness)
-            x = np.pad(x, ((0, pad_thickness), (0, 0), (0, 0)))
-        x = x.reshape(-1, thickness, x.shape[1], x.shape[2])
-        num = int(x.shape[2]/psize)
-        return x.reshape(x.shape[0], thickness, num, psize, num, psize).swapaxes(3, 4). \
-            reshape(x.shape[0], thickness, -1, psize, psize).swapaxes(1, 2).reshape(-1, thickness, psize, psize)
-
-    def _make_patches2d(self, x, psize=64):
-        num = int(x.shape[1]/psize)
-        return x.reshape(x.shape[0], num, psize, num, psize).swapaxes(2, 3).reshape( -1, psize, psize)
-
-    def _make_patches(self, x, thickness):
-        if thickness == 1:
-            return self._make_patches2d(x)
-        else:
-            return self._make_patches3d(x, thickness)
-
     def _torchify(self, x):
+        x = x.astype(np.float32)
         return torch.from_numpy(x).float().unsqueeze(1)
 
+    #VGG features
+    class _VGGLoss(nn.Module):
+        def __init__(self):
+            super(model._VGGLoss, self).__init__()
+            model.__init__(self)
+            vgg19_model = torchvision.models.vgg19(pretrained=True).eval()
+            self.feature_extractor = nn.Sequential(*list(vgg19_model.features.children())[:35]).to(self.device)
+            self.feature_extractor.eval()
+
+        def forward(self, x, y):
+            if len(x.shape)==5:
+                x = x.squeeze(2)
+            if len(y.shape)==5:
+                y = y.squeeze(2)
+            feat_x = self.feature_extractor(x.repeat(1, 3, 1, 1))
+            feat_y = self.feature_extractor(y.repeat(1, 3, 1, 1))
+            return nn.L1Loss()(feat_x, feat_y)
+    
+    #External denoising function
+    def denoise_dicom(self, in_folder, out_folder, series_description, fname):
+        noisy_array = read_dicom_folder(in_folder)
+        denoised_array = self._infer(noisy_array, fname)
+        write_dicom_folder(folder=in_folder, new_volume=denoised_array, output_folder=out_folder, series_description=series_description)
+        return None
+    
+    #Numpy array denoiser, to be implemented by each model
     @abstractmethod
-    def infer(self, x, fname):
+    def _infer(self, x, fname):
         pass
     
+    #Train function, to be implemented by each model
     @abstractmethod
-    def train(self, x, y, fname, batch_size = 48, epoch_number = 30):
-        pass
-    
-    @abstractmethod
-    def train(self, dataset, fname, batch_size = 48, epoch_number = 30):
+    def train(self, train_dataset, val_dataset, fname, batch_size = 48, epoch_number = 30):
         pass

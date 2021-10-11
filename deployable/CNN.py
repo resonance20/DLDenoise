@@ -1,15 +1,15 @@
 #%%Imports
-import os
-from sklearn.model_selection import train_test_split
 import time
 import numpy as np
+import pytorch_ssim
+import wandb
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.autograd import grad, Variable
 import torch.nn.functional as F
 import torch.utils.data
+from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 
 from deployable.model import model
@@ -46,7 +46,7 @@ class cnn(model):
 
             return x
 
-    def infer(self, x, fname = 'deployable/WGAN_gen_30.pth'):
+    def _infer(self, x, fname = 'deployable/WGAN_gen_30.pth'):
 
         self.gen.load_state_dict(torch.load(fname))
 
@@ -55,7 +55,6 @@ class cnn(model):
 
         self.gen.eval()
         patches = self._torchify(x)
-        print(patches.shape)
         denoised_patches = torch.zeros_like(patches)
 
         for i in range(0, patches.shape[0]):
@@ -67,18 +66,30 @@ class cnn(model):
         print('Inference complete!')
         return np.squeeze(denoised_patches.cpu().detach().numpy(), axis = 1)
 
-    def train(self, x, y, thickness = 1, epoch_number = 25, batch_size = 48, fname = 'WGAN'):
+    def train(self, train_dataset, val_dataset, epoch_number = 25, batch_size = 48, fname = 'WGAN'):
 
         for p in self.gen.parameters():
             p.requires_grad = True
+        
+        wandb.init(project="CT-Denoise", reinit=True)
+        wandb.run.name = fname.split("/")[-1]
+        wandb.run.save()
+        wandb.watch(self.gen)
+        wandb.config.update({'epochs':epoch_number, 'batch_size':batch_size, 'lr':1e-4})
 
-        dataloader, valloader = self._prepare_training_data(x, y, thickness=thickness, bsize=batch_size)
+        dataloader = DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=True)
+        valloader = DataLoader(dataset=val_dataset, batch_size=batch_size, shuffle=True)
 
-        optim_gen = optim.Adam(self.gen.parameters(), lr=1e-4)       
+        optim_gen = optim.Adam(self.gen.parameters(), lr=1e-4)
+        vgg_loss_fn = self._VGGLoss()       
 
         for epoch in range(epoch_number):
-            running_loss = 0
-            val_loss = 0
+            
+            l1_loss = 0
+            mse_loss = 0
+            vgg_loss = 0
+            ssim = 0
+
             self.gen.train() 
 
             start = time.time()
@@ -96,13 +107,9 @@ class cnn(model):
 
                 #Gen update step
                 outputs1 = self.gen(noisy_in)
-                gen_loss = nn.MSELoss()(phantom_in, outputs1)
+                gen_loss = nn.L1Loss()(phantom_in, outputs1) + (1 - pytorch_ssim.SSIM()(phantom_in, outputs1))
                 gen_loss.backward()
                 optim_gen.step()
-
-                # print statistics
-                running_loss += gen_loss.item()
-                #print(gen_loss.item())
 
             #Val step
             self.gen.eval()
@@ -117,22 +124,27 @@ class cnn(model):
 
                 #Forward pass
                 with torch.no_grad():
-                    #Gen update step
+                    
                     outputs1 = self.gen(noisy_in)
-                    gen_loss = nn.MSELoss()(phantom_in, outputs1)
 
-                # print statistics
-                val_loss += gen_loss.item()
+                    l1_loss += nn.L1Loss()(phantom_in, outputs1)
+                    mse_loss += nn.MSELoss()(phantom_in, outputs1)
+                    ssim += pytorch_ssim.SSIM()(phantom_in, outputs1)
+                    vgg_loss += vgg_loss_fn(phantom_in, outputs1)
 
-            print('[%d, %5d] train_loss: %f val_loss: %f' %
-                    (epoch + 1, i + 1, running_loss / int(i+1), val_loss / int(j+1) ))
-            running_loss = 0.0
-            val_loss = 0.0
             end = time.time()
             print('Time taken for epoch: '+str(end-start)+' seconds')
 
+            wandb.log({
+                'l1_loss':l1_loss/(j+1),
+                'mse_loss':mse_loss/(j+1),
+                'vgg_loss':vgg_loss/(j+1),
+                'ssim':ssim/(j+1)
+            })
+            
             if (epoch+1)%5 == 0:
                 print('Saving model...')
                 torch.save(self.gen.state_dict(), fname+'_'+str(epoch+1)+'.pth')
 
         print('Training complete!')
+        wandb.run.finish()

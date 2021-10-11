@@ -1,0 +1,9 @@
+
+wandb: WARNING Calling run.save without any arguments is deprecated.Changes to attributes are automatically persisted.
+Time taken for epoch: 7175.650791168213 seconds
+Time taken for epoch: 5124.905591964722 seconds
+Time taken for epoch: 6101.0437796115875 seconds
+Time taken for epoch: 5411.817450046539 seconds
+Time taken for epoch: 5349.855919122696 seconds
+Saving model...
+Time taken for epoch: 6092.589916467667 seconds

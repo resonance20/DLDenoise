@@ -1,0 +1,24 @@
+{
+    "os": "Windows-10-10.0.17763-SP0",
+    "python": "3.7.0",
+    "heartbeatAt": "2021-07-12T09:07:26.168943",
+    "startedAt": "2021-07-12T09:07:16.145765",
+    "docker": null,
+    "gpu": "TITAN Xp",
+    "gpu_count": 1,
+    "cpu_count": 20,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "sota_train.py",
+    "codePath": "sota_train.py",
+    "git": {
+        "remote": null,
+        "commit": "56287052e191913977fa818c31564732e987c537"
+    },
+    "email": "mayank.patwari@fau.de",
+    "root": "C:/Users/z003zv1a/Desktop/Code/analysis",
+    "host": "md2kcjtc",
+    "username": "z003zv1a",
+    "executable": "C:\\Users\\z003zv1a\\Anaconda3\\envs\\py3\\python.exe"
+}

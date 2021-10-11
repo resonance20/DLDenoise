@@ -1,0 +1,35 @@
+wandb: WARNING Calling run.save without any arguments is deprecated.Changes to attributes are automatically persisted.
+Traceback (most recent call last):
+  File "sota_train.py", line 42, in <module>
+    cnn_model.train(train_dataset=train_dataset, val_dataset=val_dataset, batch_size = 128, epoch_number = 100, fname = 'deployable/CNN10/CNN_SMN')
+  File "C:\Users\z003zv1a\Desktop\Code\analysis\deployable\CNN.py", line 109, in train
+    outputs1 = self.gen(noisy_in)
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\site-packages\torch\nn\modules\module.py", line 727, in _call_impl
+    result = self.forward(*input, **kwargs)
+  File "C:\Users\z003zv1a\Desktop\Code\analysis\deployable\CNN.py", line 47, in forward
+    x = F.relu(self.conv3(x))
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\site-packages\torch\nn\modules\module.py", line 731, in _call_impl
+    hook_result = hook(self, input, result)
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\site-packages\wandb\wandb_torch.py", line 357, in after_forward_hook
+    wandb.run.summary["graph_%i" % graph_idx] = self
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\site-packages\wandb\sdk\wandb_summary.py", line 57, in __setitem__
+    self.update({key: val})
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\site-packages\wandb\sdk\wandb_summary.py", line 79, in update
+    self._update(record)
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\site-packages\wandb\sdk\wandb_summary.py", line 134, in _update
+    self._update_callback(record)
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\site-packages\wandb\sdk\wandb_run.py", line 882, in _summary_update_callback
+    self._backend.interface.publish_summary(summary_record)
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\site-packages\wandb\sdk\interface\interface.py", line 630, in publish_summary
+    pb_summary_record = self._make_summary(summary_record)
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\site-packages\wandb\sdk\interface\interface.py", line 394, in _make_summary
+    json_value = self._summary_encode(item.value, path_from_root)
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\site-packages\wandb\sdk\interface\interface.py", line 358, in _summary_encode
+    self._run, path_from_root, value, namespace="summary"
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\site-packages\wandb\sdk\data_types.py", line 2290, in val_to_json
+    val.bind_to_run(run, key, namespace)
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\site-packages\wandb\data_types.py", line 1301, in bind_to_run
+    util.json_dump_safer(data, codecs.open(tmp_path, "w", encoding="utf-8"))
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\codecs.py", line 898, in open
+    file = builtins.open(filename, mode, buffering)
+FileNotFoundError: [Errno 2] No such file or directory: 'C:\\Users\\z003zv1a\\AppData\\Local\\Temp\\tmpx3ffg8t4wandb-media\\3d7zgid1.graph.json'

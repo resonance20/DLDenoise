@@ -1,0 +1,125 @@
+2021-07-12 15:27:29,807 INFO    MainThread:9748 [internal.py:wandb_internal():91] W&B internal server running at pid: 9748, started at: 2021-07-12 15:27:29.798054
+2021-07-12 15:27:29,810 INFO    WriterThread:9748 [datastore.py:open_for_write():80] open: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\run-iaklga79.wandb
+2021-07-12 15:27:29,810 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: check_version
+2021-07-12 15:27:29,821 DEBUG   SenderThread:9748 [sender.py:send():179] send: header
+2021-07-12 15:27:29,821 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: check_version
+2021-07-12 15:27:29,928 DEBUG   SenderThread:9748 [sender.py:send():179] send: run
+2021-07-12 15:27:30,381 INFO    SenderThread:9748 [dir_watcher.py:__init__():168] watching files in: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files
+2021-07-12 15:27:30,381 INFO    SenderThread:9748 [sender.py:_start_run_threads():719] run started: iaklga79 with start time 1626096447
+2021-07-12 15:27:30,382 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: run_start
+2021-07-12 15:27:30,382 DEBUG   SenderThread:9748 [sender.py:send():179] send: summary
+2021-07-12 15:27:30,396 INFO    SenderThread:9748 [sender.py:_save_file():841] saving file wandb-summary.json with policy end
+2021-07-12 15:27:31,388 INFO    Thread-12 :9748 [dir_watcher.py:_on_file_created():216] file/dir created: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\wandb-summary.json
+2021-07-12 15:27:35,396 INFO    Thread-12 :9748 [dir_watcher.py:_on_file_created():216] file/dir created: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\output.log
+2021-07-12 15:27:36,317 DEBUG   HandlerThread:9748 [meta.py:__init__():39] meta init
+2021-07-12 15:27:36,317 DEBUG   HandlerThread:9748 [meta.py:__init__():53] meta init done
+2021-07-12 15:27:36,317 DEBUG   HandlerThread:9748 [meta.py:probe():210] probe
+2021-07-12 15:27:36,326 DEBUG   HandlerThread:9748 [meta.py:_setup_git():200] setup git
+2021-07-12 15:27:36,681 DEBUG   HandlerThread:9748 [meta.py:_setup_git():207] setup git done
+2021-07-12 15:27:36,682 DEBUG   HandlerThread:9748 [meta.py:_save_pip():57] save pip
+2021-07-12 15:27:36,691 DEBUG   HandlerThread:9748 [meta.py:_save_pip():71] save pip done
+2021-07-12 15:27:36,692 DEBUG   HandlerThread:9748 [meta.py:_save_conda():78] save conda
+2021-07-12 15:27:36,700 ERROR   HandlerThread:9748 [meta.py:_save_conda():85] Error saving conda packages
+Traceback (most recent call last):
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\site-packages\wandb\sdk\internal\meta.py", line 83, in _save_conda
+    subprocess.call(["conda", "env", "export"], stdout=f)
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\subprocess.py", line 304, in call
+    with Popen(*popenargs, **kwargs) as p:
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\subprocess.py", line 756, in __init__
+    restore_signals, start_new_session)
+  File "C:\Users\z003zv1a\Anaconda3\envs\py3\lib\subprocess.py", line 1155, in _execute_child
+    startupinfo)
+FileNotFoundError: [WinError 2] Das System kann die angegebene Datei nicht finden
+2021-07-12 15:27:36,709 DEBUG   HandlerThread:9748 [meta.py:_save_conda():86] save conda done
+2021-07-12 15:27:36,710 DEBUG   HandlerThread:9748 [meta.py:probe():252] probe done
+2021-07-12 15:27:36,724 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:27:36,724 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:27:36,929 DEBUG   SenderThread:9748 [sender.py:send():179] send: run
+2021-07-12 15:27:37,399 INFO    Thread-12 :9748 [dir_watcher.py:_on_file_modified():229] file/dir modified: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\output.log
+2021-07-12 15:27:37,400 INFO    Thread-12 :9748 [dir_watcher.py:_on_file_modified():229] file/dir modified: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\config.yaml
+2021-07-12 15:27:37,400 INFO    Thread-12 :9748 [dir_watcher.py:_on_file_created():216] file/dir created: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\wandb-metadata.json
+2021-07-12 15:27:37,400 INFO    Thread-12 :9748 [dir_watcher.py:_on_file_created():216] file/dir created: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\requirements.txt
+2021-07-12 15:27:37,401 INFO    Thread-12 :9748 [dir_watcher.py:_on_file_created():216] file/dir created: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\conda-environment.yaml
+2021-07-12 15:27:37,749 INFO    SenderThread:9748 [sender.py:send_run():618] updated run: iaklga79
+2021-07-12 15:27:37,750 DEBUG   SenderThread:9748 [sender.py:send():179] send: files
+2021-07-12 15:27:37,750 INFO    SenderThread:9748 [sender.py:_save_file():841] saving file wandb-metadata.json with policy now
+2021-07-12 15:27:38,334 INFO    Thread-17 :9748 [upload_job.py:push():137] Uploaded file C:\Users\z003zv1a\AppData\Local\Temp\tmpit9hjs7_wandb\28gtdfer-wandb-metadata.json
+2021-07-12 15:27:45,997 DEBUG   SenderThread:9748 [sender.py:send():179] send: files
+2021-07-12 15:27:45,997 INFO    SenderThread:9748 [sender.py:_save_file():841] saving file media\graph\graph_0_summary_024abbaa636e38849fe0.graph.json with policy now
+2021-07-12 15:27:45,999 DEBUG   SenderThread:9748 [sender.py:send():179] send: summary
+2021-07-12 15:27:46,003 INFO    SenderThread:9748 [sender.py:_save_file():841] saving file wandb-summary.json with policy end
+2021-07-12 15:27:46,414 INFO    Thread-12 :9748 [dir_watcher.py:_on_file_modified():229] file/dir modified: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\wandb-summary.json
+2021-07-12 15:27:46,414 INFO    Thread-12 :9748 [dir_watcher.py:_on_file_created():216] file/dir created: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\media\graph\graph_0_summary_024abbaa636e38849fe0.graph.json
+2021-07-12 15:27:46,414 INFO    Thread-12 :9748 [dir_watcher.py:_on_file_created():216] file/dir created: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\media\graph
+2021-07-12 15:27:46,415 INFO    Thread-12 :9748 [dir_watcher.py:_on_file_created():216] file/dir created: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\media
+2021-07-12 15:27:46,620 INFO    Thread-18 :9748 [upload_job.py:push():137] Uploaded file C:\Users\z003zv1a\AppData\Local\Temp\tmpit9hjs7_wandb\2olk9lkr-media/graph/graph_0_summary_024abbaa636e38849fe0.graph.json
+2021-07-12 15:27:51,933 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:27:51,933 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:28:05,293 DEBUG   SenderThread:9748 [sender.py:send():179] send: stats
+2021-07-12 15:28:07,115 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:28:07,116 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:28:22,320 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:28:22,321 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:28:37,528 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:28:37,529 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:28:43,779 DEBUG   SenderThread:9748 [sender.py:send():179] send: stats
+2021-07-12 15:28:52,717 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:28:52,718 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:29:07,917 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:29:07,972 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:29:14,630 DEBUG   SenderThread:9748 [sender.py:send():179] send: stats
+2021-07-12 15:29:23,177 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:29:23,189 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:29:38,374 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:29:38,375 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:29:45,479 DEBUG   SenderThread:9748 [sender.py:send():179] send: stats
+2021-07-12 15:29:53,551 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:29:53,552 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:30:08,732 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:30:08,733 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:30:16,311 DEBUG   SenderThread:9748 [sender.py:send():179] send: stats
+2021-07-12 15:30:23,907 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:30:23,907 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:30:39,163 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:30:39,164 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:30:52,789 DEBUG   SenderThread:9748 [sender.py:send():179] send: stats
+2021-07-12 15:30:54,351 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:30:54,352 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:31:09,526 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:31:09,527 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:31:24,743 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:31:24,744 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:31:26,591 DEBUG   SenderThread:9748 [sender.py:send():179] send: stats
+2021-07-12 15:31:39,923 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:31:39,924 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:31:55,098 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:31:55,099 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:31:57,477 DEBUG   SenderThread:9748 [sender.py:send():179] send: stats
+2021-07-12 15:32:10,285 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:32:10,285 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:32:25,474 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:32:25,474 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:32:35,366 DEBUG   SenderThread:9748 [sender.py:send():179] send: stats
+2021-07-12 15:32:40,648 DEBUG   HandlerThread:9748 [handler.py:handle_request():124] handle_request: stop_status
+2021-07-12 15:32:40,649 DEBUG   SenderThread:9748 [sender.py:send_request():193] send_request: stop_status
+2021-07-12 15:32:50,980 WARNING MainThread:9748 [internal.py:is_dead():367] Internal process exiting, parent pid 22360 disappeared
+2021-07-12 15:32:50,981 ERROR   MainThread:9748 [internal.py:wandb_internal():143] Internal process shutdown.
+2021-07-12 15:32:51,386 INFO    WriterThread:9748 [datastore.py:close():288] close: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\run-iaklga79.wandb
+2021-07-12 15:32:51,853 INFO    SenderThread:9748 [sender.py:finish():945] shutting down sender
+2021-07-12 15:32:51,853 INFO    HandlerThread:9748 [handler.py:finish():638] shutting down handler
+2021-07-12 15:32:51,853 INFO    SenderThread:9748 [dir_watcher.py:finish():282] shutting down directory watcher
+2021-07-12 15:32:52,587 INFO    SenderThread:9748 [dir_watcher.py:finish():312] scan: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files
+2021-07-12 15:32:52,587 INFO    SenderThread:9748 [dir_watcher.py:finish():318] scan save: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\conda-environment.yaml conda-environment.yaml
+2021-07-12 15:32:52,588 INFO    SenderThread:9748 [dir_watcher.py:finish():318] scan save: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\config.yaml config.yaml
+2021-07-12 15:32:52,588 INFO    SenderThread:9748 [dir_watcher.py:finish():318] scan save: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\output.log output.log
+2021-07-12 15:32:52,589 INFO    SenderThread:9748 [dir_watcher.py:finish():318] scan save: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\requirements.txt requirements.txt
+2021-07-12 15:32:52,594 INFO    SenderThread:9748 [dir_watcher.py:finish():318] scan save: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\wandb-metadata.json wandb-metadata.json
+2021-07-12 15:32:52,594 INFO    SenderThread:9748 [dir_watcher.py:finish():318] scan save: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\wandb-summary.json wandb-summary.json
+2021-07-12 15:32:52,607 INFO    SenderThread:9748 [dir_watcher.py:finish():318] scan save: c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\media\graph\graph_0_summary_024abbaa636e38849fe0.graph.json media\graph\graph_0_summary_024abbaa636e38849fe0.graph.json
+2021-07-12 15:32:52,608 INFO    SenderThread:9748 [file_pusher.py:finish():177] shutting down file pusher
+2021-07-12 15:32:52,608 INFO    SenderThread:9748 [file_pusher.py:join():182] waiting for file pusher
+2021-07-12 15:32:53,214 INFO    Thread-21 :9748 [upload_job.py:push():137] Uploaded file c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\requirements.txt
+2021-07-12 15:32:53,217 INFO    Thread-19 :9748 [upload_job.py:push():137] Uploaded file c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\config.yaml
+2021-07-12 15:32:53,231 INFO    Thread-20 :9748 [upload_job.py:push():137] Uploaded file c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\output.log
+2021-07-12 15:32:53,247 INFO    Thread-22 :9748 [upload_job.py:push():137] Uploaded file c:\Users\z003zv1a\Desktop\Code\analysis\wandb\run-20210712_152727-iaklga79\files\wandb-summary.json
+2021-07-12 15:32:53,754 INFO    MainThread:9748 [internal.py:handle_exit():78] Internal process exited
