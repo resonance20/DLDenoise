@@ -46,6 +46,12 @@ class model(ABC):
     
     #External denoising function
     def denoise_dicom(self, in_folder, out_folder, series_description, fname):
+        """! Function to conduct inference on a given DICOM series. Calls _infer internally.
+        @param in_folder  A string containing the location of the given DICOM folder.
+        @param out_folder  A string containing the location where the denoised DICOM series will be saved.
+        @param series_description   A string with the series description of the new denoised DICOM series.
+        @return  None. The denoised DICOM series is written into a new folder.
+        """
         noisy_array = read_dicom_folder(in_folder)
         denoised_array = self._infer(noisy_array, fname)
         write_dicom_folder(folder=in_folder, new_volume=denoised_array, output_folder=out_folder, series_description=series_description)
@@ -54,9 +60,22 @@ class model(ABC):
     #Numpy array denoiser, to be implemented by each model
     @abstractmethod
     def _infer(self, x, fname):
+        """! Function to conduct inference on a give NumPy array.
+        @param x  The noisy NumPy array.
+        @param fname   The location and name of the model file containing the weights. Is a string.
+        @return  The denoised NumPy array.
+        """
         pass
     
     #Train function, to be implemented by each model
     @abstractmethod
     def train(self, train_dataset, val_dataset, fname, batch_size = 48, epoch_number = 30):
+        """! Function to train a given model.
+        @param train_dataset   The training dataset. Expected as a pair of (input, GT). This is a PyTorch dataset.
+        @param val_dataset   The validation dataset. Expected as a pair of (input, GT). This is a PyTorch dataset.
+        @param fname   The output file location and name. Do not append .pth to the filename, this is done automatically.
+        @param batch_size  Size of each training batch.
+        @param epoch_number  Number of training epochs.
+        @return  None. the output models are saved with the epoch numbers appended to the filename.
+        """
         pass
