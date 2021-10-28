@@ -55,6 +55,9 @@ def train(self, train_dataset, val_dataset, fname, batch_size = 48, epoch_number
 
 It is better practice to call ```denoise_dicom``` directly on the series instead of loading data and using ```_infer```. The resulting DICOM sreies, to the best of our knowledge, are fully DICOM compliant.
 
+## Installation
+This version can be installed and uninstalled using ```pip```. Clone the repository somewhere, navigate into the repository, and type ```pip install .```. The ```deployable``` package should now be importable system-wide.
+
 ## Example
 Here is an example to denoise a single slice using QAE:
 ```python
